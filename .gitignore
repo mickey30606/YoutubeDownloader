@@ -1,0 +1,10 @@
+# created by virtualenv automatically
+*.mp3
+build
+dist
+Lib
+Scripts
+*.spec
+*.cfg
+*.exe
+__*
