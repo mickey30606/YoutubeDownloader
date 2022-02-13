@@ -7,4 +7,4 @@ Scripts
 *.spec
 *.cfg
 *.exe
-__*
+__pycache__
