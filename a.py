@@ -10,7 +10,7 @@ import threading
 import urllib.request
 import re
 
-CONST_CHAR = ['\\', '/', '?', '"', '*', ':', '<', '>', '.', 'CON', 'PRN', 'AUX', 'CLOCK$', 'NUL', 'COM', 'LPT']
+CONST_CHAR = ['\\', '/', '?', '"', '*', ':', '<', '>', '.', '|', '&', '^', 'CON', 'PRN', 'AUX', 'CLOCK$', 'NUL', 'COM', 'LPT']
 
 def find_video_name(tmp_url):
     html2 = urllib.request.urlopen(tmp_url)
@@ -32,6 +32,10 @@ class MainWindow(QMainWindow):
     sig_enableUrlSubmit = pyqtSignal()
     sig_disableUrlSubmit = pyqtSignal()
 
+# mp3 mp4
+    mp3 = False
+    mp4 = False
+
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
@@ -46,6 +50,7 @@ class MainWindow(QMainWindow):
         self.sig_enableUrlSubmit.connect(self.S_user_enableUrlSubmit)
         self.sig_disableUrlSubmit.connect(self.S_user_disableUrlSubmit)
 
+
 # download music thread
     def Thread_downloadMusic(self, url, targetfile, isPlayList):
         pl = ''
@@ -58,14 +63,15 @@ class MainWindow(QMainWindow):
             pl = [url]
         self.sig_setOutput.emit('[INFO] 開始下載所有音檔')
         for i in range(len(pl)):
-            title = find_video_name(pl[i])
+            title = find_video_name(pl[i]) + '.mp4'
             file = pathlib.Path(targetfile) / title
             print(type(i))
             out = '[INFO] 開始下載 (' + (str((i+1))) + '/' + (str(len(pl))) + ')'
             self.sig_setOutput.emit(out)
             try:
                 GetYoutubeVideo(pl[i], str(file))
-                VideoToMusic(str(file), str(file) + '.mp3')
+                if self.mp3:
+                    VideoToMusic(str(file), str(file)[:-4] + '.mp3')
             except:
                 error += 1
                 error_name.append(title)
@@ -76,7 +82,8 @@ class MainWindow(QMainWindow):
                 continue
             out = '[SUCCESS] 下載成功 (' + (str((i+1))) + '/' + (str(len(pl))) + ')'
             self.sig_setOutput.emit(out)
-            os.unlink(file)
+            if not self.mp4:
+                os.unlink(file)
 
         if error != 0:
             self.sig_setOutput.emit('[ERROR] 有' +(str(error))+ '件檔案下載失敗，向上拉可尋找錯誤訊息，曲名清單如下：')
@@ -89,7 +96,7 @@ class MainWindow(QMainWindow):
         else:
             self.sig_setOutput.emit('[SUCCESS] 所有檔案下載成功！')
 
-        self.sig_enableUrlSubmit.emit()
+        self.endUrlSubmit()
         return
 
 # slots
@@ -114,6 +121,20 @@ class MainWindow(QMainWindow):
     def S_buttom_urlSubmit(self):
         # prepare
         self.sig_disableUrlSubmit.emit()
+        self.ui.mp3Check.setEnabled(False)
+        self.ui.mp4Check.setEnabled(False)
+
+
+        # test
+        self.mp3 = self.ui.mp3Check.isChecked()
+        self.mp4 = self.ui.mp4Check.isChecked()
+
+        if (self.mp3 | self.mp4) == 0:
+            self.sig_setOutput.emit('[ERROR] 請選擇需要下載的格式')
+            self.sig_enableUrlSubmit.emit()
+            self.endUrlSubmit()
+            return
+
         # check if it is url or not
         print('submit')
         tmp_url = self.ui.urlInput.toPlainText()
@@ -121,11 +142,13 @@ class MainWindow(QMainWindow):
             tmp_url = 'https://' + tmp_url
         if tmp_url.find('youtube') == -1:
             self.sig_setOutput.emit('[ERROR] 錯誤的網址！！')
+            self.endUrlSubmit()
             return
         try:
             urllib.request.urlopen(tmp_url)
         except:
             self.sig_setOutput.emit('[ERROR] 錯誤的網址！！')
+            self.endUrlSubmit()
             return
         self.sig_setOutput.emit('[SUCCESS] 網址讀取成功')
 
@@ -144,6 +167,12 @@ class MainWindow(QMainWindow):
         t = threading.Thread(target=self.Thread_downloadMusic, kwargs=dict(url=tmp_url,targetfile=self.folder_path, isPlayList=isPlayList))
         t.start()
 
+        return
+
+    def endUrlSubmit(self):
+        self.sig_enableUrlSubmit.emit()
+        self.ui.mp3Check.setEnabled(True)
+        self.ui.mp4Check.setEnabled(True)
         return
 
 

@@ -9,3 +9,4 @@ Scripts
 *.exe
 __pycache__
 *.tmp
+*.mp4

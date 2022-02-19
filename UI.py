@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'test.ui'
+# Form implementation generated from reading ui file 'UI.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -56,16 +56,26 @@ class Ui_MainWindow(object):
         self.urlSubmit.setObjectName("urlSubmit")
         self.horizontalLayout.addWidget(self.urlSubmit)
         self.verticalLayout.addLayout(self.horizontalLayout)
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.mp4Check = QtWidgets.QCheckBox(self.layoutWidget)
+        self.mp4Check.setObjectName("mp4Check")
+        self.verticalLayout_2.addWidget(self.mp4Check)
+        self.mp3Check = QtWidgets.QCheckBox(self.layoutWidget)
+        self.mp3Check.setChecked(True)
+        self.mp3Check.setObjectName("mp3Check")
+        self.verticalLayout_2.addWidget(self.mp3Check)
+        self.verticalLayout.addLayout(self.verticalLayout_2)
         self.output = QtWidgets.QPlainTextEdit(self.layoutWidget)
         self.output.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.output.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
         self.output.setReadOnly(True)
         self.output.setObjectName("output")
         self.verticalLayout.addWidget(self.output)
-        self.verticalLayout.setStretch(2, 10)
+        self.verticalLayout.setStretch(3, 10)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -80,6 +90,8 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.viewFolder.setText(_translate("MainWindow", "瀏覽資料夾"))
         self.urlSubmit.setText(_translate("MainWindow", "點擊下載"))
+        self.mp4Check.setText(_translate("MainWindow", ".mp4"))
+        self.mp3Check.setText(_translate("MainWindow", ".mp3"))
 
 
 if __name__ == "__main__":

@@ -23,7 +23,7 @@
       <height>481</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,10">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,10">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
@@ -93,6 +93,27 @@
       </layout>
      </item>
      <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QCheckBox" name="mp4Check">
+         <property name="text">
+          <string>.mp4</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="mp3Check">
+         <property name="text">
+          <string>.mp3</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
       <widget class="QPlainTextEdit" name="output">
        <property name="horizontalScrollBarPolicy">
         <enum>Qt::ScrollBarAsNeeded</enum>
@@ -114,7 +135,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
