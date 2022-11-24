@@ -9,6 +9,8 @@ import os
 import threading
 import urllib.request
 import re
+from moviepy.editor import *
+
 
 CONST_CHAR = ['\\', '/', '?', '"', '*', ':', '<', '>', '.', '|', '&', '^', 'CON', 'PRN', 'AUX', 'CLOCK$', 'NUL', 'COM', 'LPT']
 
@@ -42,9 +44,12 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.ui.urlInput.setText('請輸入網址')
         self.ui.showFolder.setText(self.folder_path)
+        self.ui.m24_chooseFolder.setText(self.folder_path)
 
         self.ui.viewFolder.clicked.connect(self.S_buttom_viewfolder)
         self.ui.urlSubmit.clicked.connect(self.S_buttom_urlSubmit)
+        self.ui.m24_chooseFolderButton.clicked.connect(self.S_button_m24_choose_folder)
+        self.ui.m24_convert.clicked.connect(self.S_button_m24_convert)
 
         self.sig_setOutput.connect(self.S_user_setOutput)
         self.sig_enableUrlSubmit.connect(self.S_user_enableUrlSubmit)
@@ -99,7 +104,38 @@ class MainWindow(QMainWindow):
         self.endUrlSubmit()
         return
 
+    def Thread_m24Convert(self, targetFile):
+        mov = [_ for _ in os.listdir(targetFile) if _.endswith(".MOV")]
+        self.sig_setOutput.emit('[INFO] 發現檔案')
+        for i in mov:
+            self.sig_setOutput.emit('[FILENAME] ' + i)
+
+        for i in mov:
+            self.sig_setOutput.emit(f'[INFO] 正在轉換 {i}')
+            video = VideoFileClip(targetFile+'/'+i)
+            output = video.copy()
+            output.write_videofile(f"{i[:-4]}.mp4",temp_audiofile="temp-audio.m4a", remove_temp=True, codec="libx264", audio_codec="aac")
+            self.sig_setOutput.emit(f'[SUCCESS] {i} 轉換成功！')
+
+
+        return
+
 # slots
+    def S_button_m24_convert(self):
+
+        t = threading.Thread(target=self.Thread_m24Convert, kwargs=dict(targetFile=self.folder_path))
+        t.start()
+        return
+
+    def S_button_m24_choose_folder(self):
+        path = QFileDialog.getExistingDirectory(self, "Open folder", "./")
+        if path != '':
+            self.folder_path = path
+        self.ui.m24_chooseFolder.setText(self.folder_path)
+        # print(os.listdir(self.folder_path))
+        return
+
+
     def S_user_enableUrlSubmit(self):
         self.ui.urlSubmit.setEnabled(True)
         return
