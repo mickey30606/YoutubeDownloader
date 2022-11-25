@@ -26,6 +26,7 @@ def find_video_name(tmp_url):
 
 class MainWindow(QMainWindow):
     folder_path = str(pathlib.Path(__file__).parent.absolute())
+    target_folder_path = str(pathlib.Path(__file__).parent.absolute())
     result=''
 
 # self define signals
@@ -45,11 +46,13 @@ class MainWindow(QMainWindow):
         self.ui.urlInput.setText('請輸入網址')
         self.ui.showFolder.setText(self.folder_path)
         self.ui.m24_chooseFolder.setText(self.folder_path)
+        self.ui.m24_chooseTargetFolder.setText(self.target_folder_path)
 
         self.ui.viewFolder.clicked.connect(self.S_buttom_viewfolder)
         self.ui.urlSubmit.clicked.connect(self.S_buttom_urlSubmit)
         self.ui.m24_chooseFolderButton.clicked.connect(self.S_button_m24_choose_folder)
         self.ui.m24_convert.clicked.connect(self.S_button_m24_convert)
+        self.ui.m24_chooseTargetButton.clicked.connect(self.S_button_m24_choose_targetfolder)
 
         self.sig_setOutput.connect(self.S_user_setOutput)
         self.sig_enableUrlSubmit.connect(self.S_user_enableUrlSubmit)
@@ -104,7 +107,7 @@ class MainWindow(QMainWindow):
         self.endUrlSubmit()
         return
 
-    def Thread_m24Convert(self, targetFile):
+    def Thread_m24Convert(self, targetFile, targetFolder):
         mov = [_ for _ in os.listdir(targetFile) if _.endswith(".MOV")]
         self.sig_setOutput.emit('[INFO] 發現檔案')
         for i in mov:
@@ -114,16 +117,24 @@ class MainWindow(QMainWindow):
             self.sig_setOutput.emit(f'[INFO] 正在轉換 {i}')
             video = VideoFileClip(targetFile+'/'+i)
             output = video.copy()
-            output.write_videofile(f"{i[:-4]}.mp4",temp_audiofile="temp-audio.m4a", remove_temp=True, codec="libx264", audio_codec="aac")
+            output.write_videofile(f"{targetFolder}/{i[:-4]}.mp4",temp_audiofile="temp-audio.m4a", remove_temp=True, codec="libx264", audio_codec="aac")
             self.sig_setOutput.emit(f'[SUCCESS] {i} 轉換成功！')
 
-
+        self.ui.m24_convert.setEnabled(True)
         return
 
 # slots
-    def S_button_m24_convert(self):
+    def S_button_m24_choose_targetfolder(self):
+        path = QFileDialog.getExistingDirectory(self, "Open folder", "./")
+        if path != '':
+            self.target_folder_path = path
+        self.ui.m24_chooseTargetFolder.setText(self.target_folder_path)
+        return
 
-        t = threading.Thread(target=self.Thread_m24Convert, kwargs=dict(targetFile=self.folder_path))
+    def S_button_m24_convert(self):
+        self.ui.m24_convert.setEnabled(False)
+
+        t = threading.Thread(target=self.Thread_m24Convert, kwargs=dict(targetFile=self.folder_path, targetFolder=self.target_folder_path))
         t.start()
         return
 
